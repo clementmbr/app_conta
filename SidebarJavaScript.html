@@ -29,13 +29,13 @@
             // Respond to success conditions here.
             $('#sidebar-value').val(msg);
             showStatus('Pulled value successfully.');
-            element.disabled = false;
+            element.disabled = true;
           })
         .withFailureHandler(
           function(msg, element) {
             // Respond to failure conditions here.
             showStatus(msg, 'error');
-            element.disabled = false;
+            element.disabled = true;
           })
         .withUserObject(this)
         .getActiveValue();

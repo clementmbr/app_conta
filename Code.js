@@ -40,18 +40,18 @@ function newEventSidebar() {
   SpreadsheetApp.getUi().newEventSidebar(ui);
 }
 
-/**
- * Opens a dialog. The dialog structure is described in the Dialog.html
- * project file.
- */
-function showDialog() {
-  var ui = HtmlService.createTemplateFromFile('Dialog')
-      .evaluate()
-      .setWidth(400)
-      .setHeight(190)
-      .setSandboxMode(HtmlService.SandboxMode.IFRAME);
-  SpreadsheetApp.getUi().showModalDialog(ui, DIALOG_TITLE);
-}
+// /**
+//  * Opens a dialog. The dialog structure is described in the Dialog.html
+//  * project file.
+//  */
+// function showDialog() {
+//   var ui = HtmlService.createTemplateFromFile('Dialog')
+//       .evaluate()
+//       .setWidth(400)
+//       .setHeight(190)
+//       .setSandboxMode(HtmlService.SandboxMode.IFRAME);
+//   SpreadsheetApp.getUi().showModalDialog(ui, DIALOG_TITLE);
+// }
 
 /**
  * Returns the value in the active cell.
@@ -75,21 +75,21 @@ function setActiveValue(value) {
   cell.setValue(value);
 }
 
-/**
- * Executes the specified action (create a new sheet, copy the active sheet, or
- * clear the current sheet).
- *
- * @param {String} action An identifier for the action to take.
- */
-function modifySheets(action) {
-  // Use data collected from dialog to manipulate the spreadsheet.
-  var ss = SpreadsheetApp.getActiveSpreadsheet();
-  var currentSheet = ss.getActiveSheet();
-  if (action == "create") {
-    ss.insertSheet();
-  } else if (action == "copy") {
-    currentSheet.copyTo(ss);
-  } else if (action == "clear") {
-    currentSheet.clear();
-  }
-}
+// /**
+//  * Executes the specified action (create a new sheet, copy the active sheet, or
+//  * clear the current sheet).
+//  *
+//  * @param {String} action An identifier for the action to take.
+//  */
+// function modifySheets(action) {
+//   // Use data collected from dialog to manipulate the spreadsheet.
+//   var ss = SpreadsheetApp.getActiveSpreadsheet();
+//   var currentSheet = ss.getActiveSheet();
+//   if (action == "create") {
+//     ss.insertSheet();
+//   } else if (action == "copy") {
+//     currentSheet.copyTo(ss);
+//   } else if (action == "clear") {
+//     currentSheet.clear();
+//   }
+// }
