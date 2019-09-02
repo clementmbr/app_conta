@@ -12,9 +12,16 @@
         Selecione os participantes do novo evento
       </p>
 
+      <div class="block form-group" id="sidebar-value-block">
+        <label for="name-event-value">Nome do evento : </label>
+        <input type="text" id="name-event-value">
+        <label for="date-event-value">Data do evento : </label>
+        <input type="date" id="date-event-value">
+      </div>
 
-
-
+      <div class="block" id="sidebar-button-bar">
+        <button id="new-event-button">Criar Novo Evento</button>
+      </div>
 
 
 
@@ -39,6 +46,6 @@
     </div>
 
     <!-- Use a templated HTML printing scriptlet to import JavaScript. -->
-    <?!= HtmlService.createHtmlOutputFromFile('SidebarJavaScript').getContent(); ?>
+    <?!= HtmlService.createHtmlOutputFromFile('SidebarNewEventJavaScript').getContent(); ?>
   </body>
 </html>

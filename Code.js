@@ -33,11 +33,11 @@ function onInstall(e) {
  * project file.
  */
 function newEventSidebar() {
-  var ui = HtmlService.createTemplateFromFile('Sidebar')
+  var ui = HtmlService.createTemplateFromFile('SidebarNewEvent')
       .evaluate()
       .setTitle(SIDEBAR_EVENT_TITLE)
       .setSandboxMode(HtmlService.SandboxMode.IFRAME);
-  SpreadsheetApp.getUi().newEventSidebar(ui);
+  SpreadsheetApp.getUi().showSidebar(ui); // "showSidebar" is a special SpreadsheetApp funcion
 }
 
 // /**
@@ -52,6 +52,22 @@ function newEventSidebar() {
 //       .setSandboxMode(HtmlService.SandboxMode.IFRAME);
 //   SpreadsheetApp.getUi().showModalDialog(ui, DIALOG_TITLE);
 // }
+
+/**
+ * Replaces the active cell value with the given value.
+ *
+ * @param {Number} value A reference number to replace with.
+ */
+function createNewEvent(name_event, date_event) {
+  // Use data collected from sidebar to manipulate the sheet.
+  Logger.log("Evento criado! Com o nome " + name_event + "e a Data " + date_event)
+
+
+  // var cell = SpreadsheetApp.getActiveSheet().getActiveCell();
+  // cell.setValue(name_event + date_event);
+}
+
+
 
 /**
  * Returns the value in the active cell.
