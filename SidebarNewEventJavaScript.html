@@ -6,8 +6,8 @@
   $(function() {
     // Assign handler functions to sidebar elements here, if needed.
     $('#new-event-button').click(onNewEventClick);
-    $('#sidebar-pull-button').click(onPullClick);
-    $('#sidebar-put-button').click(onPutClick);
+    // $('#sidebar-pull-button').click(onPullClick);
+    // $('#sidebar-put-button').click(onPutClick);
 
     // Call the server here to retrieve any information needed to build
     // the dialog, if necessary.
@@ -25,13 +25,22 @@
     // Gather any information that needs to be sent to the server here.
     var name_event = $('#name-event-value').val();
     var date_event = $('#date-event-value').val();
+    
+    if($('#member1').prop("checked") == true) {
+      var member1 = $('#member1').val();
+    }
+    if($('#member2').prop("checked") == true) {
+      var member2 = $('#member2').val();
+    }
+    var members_list = [member1, member2]
+
 
     // Send the value to the server and handle the response.
     google.script.run
         .withSuccessHandler(
           function(msg, element) {
             // Respond to success conditions here.
-            showStatus('O evento ' + name_event + 'foi criado !');
+            showStatus('O evento ' + name_event + ' foi criado !');
             element.disabled = false;
           })
         .withFailureHandler(
@@ -41,70 +50,70 @@
             element.disabled = false;
           })
         .withUserObject(this) // "this" refers to the "Put" button itself here
-        .createNewEvent(name_event, date_event);
+        .createNewEvent(name_event, date_event, members_list);
   }
 
 
 
 
 
-  /**
-   * Calls the server to retrieve information from the sheet.
-   * Gets the value in the active cell, which is then placed in the
-   * sidebar text field.
-   */
-  function onPullClick() {
-    this.disabled = true;
-
-    // Gather any information that needs to be sent to the server here.
-
-    // Send the value to the server and handle the response.
-    google.script.run
-        .withSuccessHandler(
-          function(msg, element) {
-            // Respond to success conditions here.
-            $('#sidebar-value').val(msg);
-            showStatus('Pulled value successfully.');
-            element.disabled = false; // to enable the button after using it
-          })
-        .withFailureHandler(
-          function(msg, element) {
-            // Respond to failure conditions here.
-            showStatus(msg, 'error');
-            element.disabled = false;
-          })
-        .withUserObject(this)
-        .getActiveValue();
-  }
-
-  /**
-   * Calls the server to modify the sheet.
-   * Replace the currently selected cell value with the value in the
-   * sidebar text field.
-   */
-  function onPutClick() {
-    this.disabled = true;
-
-    // Gather any information that needs to be sent to the server here.
-    var value = $('#sidebar-value').val();
-
-    // Send the value to the server and handle the response.
-    google.script.run
-        .withSuccessHandler(
-          function(msg, element) {
-            // Respond to success conditions here.
-            showStatus('Cell set to reference value: ' + value);
-            element.disabled = false;
-          })
-        .withFailureHandler(
-          function(msg, element) {
-            // Respond to failure conditions here.
-            showStatus(msg, 'error');
-            element.disabled = false;
-          })
-        .withUserObject(this) // "this" refers to the "Put" button itself here
-        .setActiveValue(value);
-  }
+  // /**
+  //  * Calls the server to retrieve information from the sheet.
+  //  * Gets the value in the active cell, which is then placed in the
+  //  * sidebar text field.
+  //  */
+  // function onPullClick() {
+  //   this.disabled = true;
+  //
+  //   // Gather any information that needs to be sent to the server here.
+  //
+  //   // Send the value to the server and handle the response.
+  //   google.script.run
+  //       .withSuccessHandler(
+  //         function(msg, element) {
+  //           // Respond to success conditions here.
+  //           $('#sidebar-value').val(msg);
+  //           showStatus('Pulled value successfully.');
+  //           element.disabled = false; // to enable the button after using it
+  //         })
+  //       .withFailureHandler(
+  //         function(msg, element) {
+  //           // Respond to failure conditions here.
+  //           showStatus(msg, 'error');
+  //           element.disabled = false;
+  //         })
+  //       .withUserObject(this)
+  //       .getActiveValue();
+  // }
+  //
+  // /**
+  //  * Calls the server to modify the sheet.
+  //  * Replace the currently selected cell value with the value in the
+  //  * sidebar text field.
+  //  */
+  // function onPutClick() {
+  //   this.disabled = true;
+  //
+  //   // Gather any information that needs to be sent to the server here.
+  //   var value = $('#sidebar-value').val();
+  //
+  //   // Send the value to the server and handle the response.
+  //   google.script.run
+  //       .withSuccessHandler(
+  //         function(msg, element) {
+  //           // Respond to success conditions here.
+  //           showStatus('Cell set to reference value: ' + value);
+  //           element.disabled = false;
+  //         })
+  //       .withFailureHandler(
+  //         function(msg, element) {
+  //           // Respond to failure conditions here.
+  //           showStatus(msg, 'error');
+  //           element.disabled = false;
+  //         })
+  //       .withUserObject(this) // "this" refers to the "Put" button itself here
+  //       .setActiveValue(value);
+  // }
 
   /**
    * Displays the given status message in the sidebar.

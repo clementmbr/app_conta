@@ -58,9 +58,10 @@ function newEventSidebar() {
  *
  * @param {Number} value A reference number to replace with.
  */
-function createNewEvent(name_event, date_event) {
+function createNewEvent(name_event, date_event, members_list) {
   // Use data collected from sidebar to manipulate the sheet.
-  Logger.log("Evento criado! Com o nome " + name_event + "e a Data " + date_event)
+  Logger.log("Evento criado! Com o nome " + name_event + " e a Data " + date_event + " e a lista : ")
+  Logger.log(members_list)
 
 
   // var cell = SpreadsheetApp.getActiveSheet().getActiveCell();
