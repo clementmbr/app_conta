@@ -1,13 +1,21 @@
 <!-- This CSS package applies Google styling; it should always be included. -->
-<link rel="stylesheet" href="https://ssl.gstatic.com/docs/script/css/add-ons.css">
+<link rel="stylesheet" href="https://ssl.gstatic.com/docs/script/css/add-ons1.css">
 
 <style>
+input[type=date] {
+  width: 70%;
+}
+
+input[type=number] {
+  width: 40%;
+}
+
 label {
   font-weight: bold;
 }
 
 .branding-below {
-  bottom: 54px;
+  bottom: 30px;
   top: 0;
 }
 
@@ -26,6 +34,20 @@ label {
   box-sizing: border-box;
   -webkit-box-sizing : border-box;‌
   -moz-box-sizing : border-box;
+}
+
+.col-one {
+  float: left;
+  width: 50%;
+}
+
+.col-contain {
+  overflow: hidden;
+}
+
+.col-date {
+  float: left;
+  width: 60%;
 }
 
 #sidebar-value-block,

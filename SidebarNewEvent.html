@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <base target="_top">
+    <!-- Use a templated HTML printing scriptlet to import common stylesheet -->
+    <?!= HtmlService.createHtmlOutputFromFile('Stylesheet').getContent(); ?>
+  </head>
+  <body>
+    <!-- Below is the HTML code that defines the sidebar element structure. -->
+    <div class="sidebar branding-below">
+
+
+      <label for="name-event-value">Nome do evento</label><br>
+      <input type="text" id="name-event-value"><br>
+
+      <div>
+        <div class="col-date">
+        <!-- TODO add a smaller space than <br> with CSS option
+          between "name-event-value" and date-event-value -->
+          <br><label for="date-event-value">Data do evento</label><br>
+          <input type="date" id="date-event-value">
+        </div>
+        <div>
+          <br><label for="income-event-value">Cachê</label><br>
+          <input type="number" id="income-event-value">
+        </div>
+      </div>
+      <p>
+        Selecione os participantes do novo evento
+      </p>
+      <div class="block col-contain" id="sidebar-value-block">
+        <!-- TODO generate this members list from the names in the sheets names -->
+        <div class="col-one">
+          <input type="checkbox" name="member" id="member1" value="Daniel" checked><label for="member1"> Daniel</label><br>
+          <input type="checkbox" name="member" id="member2" value="Pano" checked><label for="member2"> Pano</label><br>
+          <input type="checkbox" name="member" id="member3" value="Clément" checked><label for="member3"> Clément</label><br>
+          <input type="checkbox" name="member" id="member4" value="João" checked><label for="member4"> João</label><br>
+          <input type="checkbox" name="member" id="member5" value="Michel" checked><label for="member5"> Michel</label><br>
+        </div>
+        <div>
+          <input type="checkbox" name="member" id="member6" value="Raphael" checked><label for="member6"> Raphael</label><br>
+          <input type="checkbox" name="member" id="member7" value="Luciano" checked><label for="member7"> Luciano</label><br>
+          <input type="checkbox" name="member" id="member8" value="Mathias" checked><label for="member8"> Mathias</label><br>
+          <input type="checkbox" name="member" id="member9" value="ContaPJ" checked><label for="member9"> Conta PJ</label><br>
+          <!-- TODO add a checkbox to select all : https://stackoverflow.com/questions/386281/how-to-implement-select-all-check-box-in-html -->
+        </div>
+      </div>
+      <p>
+        Vai ter dinheiro para a Caixa e/ou a Produção ?
+      </p>
+      <div class="block form-group" id="sidebar-value-block">
+        <input type="checkbox" name="extra_fee" id="production"><label for="production"> Produção</label><br>
+        <input type="checkbox" name="extra_fee" id="cashflow"><label for="cashflow"> Caixa</label><br>
+      </div>
+      <div class="block" id="sidebar-button-bar">
+        <button id="new-event-button">Novo Evento</button>
+      </div>
+
+      <div id="sidebar-status"></div>
+    </div>
+
+    <!-- Enter sidebar bottom-branding below. -->
+    <div class="sidebar bottom">
+      <img alt="Add-on logo" class="logo" width="25"
+          src="https://bagunco.com/wp-content/uploads/2018/03/logo_laranja_Web.png">
+      <span class="gray branding-text">Spreadsheet Add-on by Clément</span>
+    </div>
+
+    <!-- Use a templated HTML printing scriptlet to import JavaScript. -->
+    <?!= HtmlService.createHtmlOutputFromFile('NewEventJavaScript').getContent(); ?>
+  </body>
+</html>
