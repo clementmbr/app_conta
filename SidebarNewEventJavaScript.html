@@ -5,60 +5,60 @@
    */
   $(function() {
     // Assign handler functions to sidebar elements here, if needed.
-    $('#sidebar-pull-button').click(onPullClick);
-    $('#sidebar-put-button').click(onPutClick);
+    $('#new-event-button').click(onNewEventClick);
 
     // Call the server here to retrieve any information needed to build
     // the dialog, if necessary.
   });
 
-  /**
-   * Calls the server to retrieve information from the sheet.
-   * Gets the value in the active cell, which is then placed in the
-   * sidebar text field.
-   */
-  function onPullClick() {
-    this.disabled = true;
-
-    // Gather any information that needs to be sent to the server here.
-
-    // Send the value to the server and handle the response.
-    google.script.run
-        .withSuccessHandler(
-          function(msg, element) {
-            // Respond to success conditions here.
-            $('#sidebar-value').val(msg);
-            showStatus('Pulled value successfully.');
-            element.disabled = false;
-          })
-        .withFailureHandler(
-          function(msg, element) {
-            // Respond to failure conditions here.
-            showStatus(msg, 'error');
-            element.disabled = false;
-          })
-        .withUserObject(this)
-        .getActiveValue();
-  }
 
   /**
    * Calls the server to modify the sheet.
    * Replace the currently selected cell value with the value in the
    * sidebar text field.
    */
-  function onPutClick() {
+  function onNewEventClick() {
     this.disabled = true;
 
     // Gather any information that needs to be sent to the server here.
-    var value = $('#sidebar-value').val();
+    var name_event = $('#name-event-value').val();
+    var date_event = $('#date-event-value').val();
+    var income_event = $('#income-event-value').val();
+
+    // TODO : Add a stop alert if it already exists an event with
+    // the same name at the same date
+
+    var inputs_member = document.getElementsByName('member');
+
+    var members_list = []
+    for(var i = 0; i < inputs_member.length; i++) {
+        if(inputs_member[i].checked == true) {
+            members_list[members_list.length] = inputs_member[i].value;
+        }
+    }
+
+    var inputs_extra_fee = document.getElementsByName('extra_fee');
+    var extra_fee = []
+
+    // extra_fee array is set to look like :
+    // [{production : true} , {cashflow : false}]
+    for(var i = 0; i < inputs_extra_fee.length; i++) {
+
+        var obj_extra_fee = {};
+        obj_extra_fee[inputs_extra_fee[i].id] = inputs_extra_fee[i].checked;
+
+        extra_fee.splice(extra_fee.length, 0, obj_extra_fee);
+    }
+
 
     // Send the value to the server and handle the response.
     google.script.run
         .withSuccessHandler(
           function(msg, element) {
             // Respond to success conditions here.
-            showStatus('Cell set to reference value: ' + value);
+            showStatus('O evento ' + name_event + ' foi criado !');
             element.disabled = false;
+            
           })
         .withFailureHandler(
           function(msg, element) {
@@ -66,9 +66,16 @@
             showStatus(msg, 'error');
             element.disabled = false;
           })
-        .withUserObject(this)
-        .setActiveValue(value);
+        .withUserObject(this) // "this" refers to the "Put" button itself here
+        .createNewEvent(
+          name_event,
+          date_event,
+          income_event,
+          members_list,
+          extra_fee,
+        );
   }
+
 
   /**
    * Displays the given status message in the sidebar.
