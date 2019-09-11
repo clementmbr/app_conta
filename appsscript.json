@@ -2,14 +2,5 @@
   "timeZone": "America/New_York",
   "dependencies": {
   },
-  "exceptionLogging": "STACKDRIVER",
-  "sheets": {
-    "macros": [{
-      "menuName": "alternativeColor",
-      "functionName": "alternativeColor"
-    }, {
-      "menuName": "removeAlternativeColor",
-      "functionName": "removeAlternativeColor"
-    }]
-  }
+  "exceptionLogging": "STACKDRIVER"
 }

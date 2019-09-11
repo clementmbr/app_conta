@@ -2,7 +2,7 @@
  * @OnlyCurrentDoc  Limits the script to only accessing the current spreadsheet.
  */
 
-var DIALOG_TITLE = 'Example Dialog';
+var DIALOG_TITLE = 'Novo Evento';
 var SIDEBAR_EVENT_TITLE = 'Novo Evento';
 
 /**
@@ -13,8 +13,8 @@ var SIDEBAR_EVENT_TITLE = 'Novo Evento';
 function onOpen(e) {
   SpreadsheetApp.getUi()
       .createAddonMenu()
-      .addItem('Novo Evento', 'newEventSidebar')
-      // .addItem('Show dialog', 'showDialog')
+//      .addItem('Novo Evento', 'newEventSidebar')
+      .addItem('Novo Evento', 'newEventDialog')
       .addToUi();
 }
 
@@ -28,35 +28,35 @@ function onInstall(e) {
   onOpen(e);
 }
 
-/**
- * Opens a sidebar. The sidebar structure is described in the Sidebar.html
- * project file.
- */
-function newEventSidebar() {
-  var ui = HtmlService.createTemplateFromFile('SidebarNewEvent')
-      .evaluate()
-      .setTitle(SIDEBAR_EVENT_TITLE)
-      .setSandboxMode(HtmlService.SandboxMode.IFRAME);
-  SpreadsheetApp.getUi().showSidebar(ui); // "showSidebar" is a special SpreadsheetApp funcion
-}
+///**
+// * Opens a sidebar. The sidebar structure is described in the Sidebar.html
+// * project file.
+// */
+//function newEventSidebar() {
+//  var ui = HtmlService.createTemplateFromFile('NewEvent')
+//      .evaluate()
+//      .setTitle(SIDEBAR_EVENT_TITLE)
+//      .setSandboxMode(HtmlService.SandboxMode.IFRAME);
+//  SpreadsheetApp.getUi().showSidebar(ui); // "showSidebar" is a special SpreadsheetApp funcion
+//}
 
-// /**
-//  * Opens a dialog. The dialog structure is described in the Dialog.html
-//  * project file.
-//  */
-// function showDialog() {
-//   var ui = HtmlService.createTemplateFromFile('Dialog')
-//       .evaluate()
-//       .setWidth(400)
-//       .setHeight(190)
-//       .setSandboxMode(HtmlService.SandboxMode.IFRAME);
-//   SpreadsheetApp.getUi().showModalDialog(ui, DIALOG_TITLE);
-// }
+ /**
+  * Opens a dialog. The dialog structure is described in the Dialog.html
+  * project file.
+  */
+ function newEventDialog() {
+   var ui = HtmlService.createTemplateFromFile('NewEvent')
+       .evaluate()
+       .setWidth(350)
+       .setHeight(500)
+       .setSandboxMode(HtmlService.SandboxMode.IFRAME);
+   SpreadsheetApp.getUi().showModalDialog(ui, DIALOG_TITLE);
+ }
 
 /**
  * Create the formatted columns of a new account event
  *
- * Exemples of parameters : 
+ * Exemples of parameters received by the client-side JS : 
  * 
  * var name_event = "Nome do Evento";
  * var date_event = "01/01/2020";
@@ -196,7 +196,7 @@ function createNewEvent(
         
       var col_letter_person = String.fromCharCode(67 + k);
       var col_letter_percent = String.fromCharCode(69 + k);
-      var formula_leftover = "=" + col_letter_percent + "2*(C3-SUM(" + col_letter_person + "5:" + col_letter_person +"200))";
+      var formula_leftover = "=" + col_letter_percent + "2*C3-SUM(" + col_letter_person + "5:" + col_letter_person +"200)";
         
       sheet_events.getRange(3, 5 + k)
         .setFormula(formula_leftover)  // Leftover in the first extra_fee column
@@ -323,8 +323,102 @@ function createNewEvent(
   r_total.setFontColor(s_second_font);
 
   // Set Borders
-  sheet_events.getRange(1, 1, 200, col_nb).setBorder(null, true, null, true, null, null, '#000000', SpreadsheetApp.BorderStyle.SOLID_THICK);
-  sheet_events.getRange(1, 1, 3, col_nb).setBorder(null, null, true, null, null, null, '#000000', SpreadsheetApp.BorderStyle.SOLID);
+  sheet_events.getRange(1, 1, 200, col_nb)
+    .setBorder(null, true, null, true, null, null, '#000000', SpreadsheetApp.BorderStyle.SOLID_THICK);
+  sheet_events.getRange(1, 1, 3, col_nb)
+    .setBorder(null, null, true, null, null, null, '#000000', SpreadsheetApp.BorderStyle.SOLID);
+
+  sheet_events.getRange(5, 1, members_list.length + 3, col_nb)
+    .setBorder(null, null, null, null, true, null, '#000000', SpreadsheetApp.BorderStyle.DOTTED);
+    
+  sheet_events.getRange(4, 1, 1, col_nb)
+    .setBorder(true, null, true, null, null, null, '#000000', SpreadsheetApp.BorderStyle.SOLID);
+    
+  sheet_events.getRange(2, 1, 2, 4)
+    .setBorder(true, null, null, true, null, null, '#000000', SpreadsheetApp.BorderStyle.SOLID);
+    
+    //Set Borders to the extra_fee infos
+  if (add_col > 0) {
+    sheet_events.getRange(1, 6, 1, add_col)
+      .setBorder(null, null, true, null, null, null, '#000000', SpreadsheetApp.BorderStyle.SOLID);
+      
+    sheet_events.getRange(1, 6, 3, add_col)
+      .setBorder(null, true, null, null, null, null, '#000000', SpreadsheetApp.BorderStyle.SOLID);
+      
+    sheet_events.getRange(4, 4, 1, add_col)
+      .setBorder(null, true, null, true, null, null, '#000000', SpreadsheetApp.BorderStyle.DOTTED);
+  }
+  
+  sheet_events.getRange(4, 3)
+    .setBorder(null, null, null, true, null, null, '#000000', SpreadsheetApp.BorderStyle.DOTTED);
+    
+    
+  // Set Protection on cells with formulas
+  sheet_events.getRange(3, 3, 1, 3)
+    .protect()
+    .setDescription('Protect formula changes on Incomes cells')
+    .setWarningOnly(true);
+    
+  sheet_events.getRange(5, 4 + add_col, members_list.length + 1, 1)
+    .protect()
+    .setDescription('Protect formula changes on TOTAL cells')
+    .setWarningOnly(true);
+    
+  if (add_col > 0) {
+    sheet_events.getRange(1, 6, 3, add_col)
+      .protect()
+      .setDescription('Protect formula changes on Extra_fee cells')
+      .setWarningOnly(true);  
+  }
+  
+  // Set conditional formatting on TOTAL-Received columns
+  
+  var cond_formula = '=$'.concat(
+    String.fromCharCode(69 + add_col),
+    '5>=ROUNDDOWN($',
+    String.fromCharCode(68 + add_col),
+    '5)'
+  );
+  
+  var conditionalFormatRules = sheet_events.getConditionalFormatRules();
+  conditionalFormatRules.push(SpreadsheetApp.newConditionalFormatRule()
+    .setRanges([sheet_events.getRange(5,4 + add_col, members_list.length, 2)])
+    .whenFormulaSatisfied(cond_formula)
+    .setBackground('#63EB69')
+    .build());
+    
+     // Conditional Formatting also for Income-received
+  conditionalFormatRules.push(SpreadsheetApp.newConditionalFormatRule()
+    .setRanges([sheet_events.getRange(3, 1, 1, 2)])
+    .whenFormulaSatisfied("=$B3>=ROUNDDOWN($A3)")
+    .setBackground('#63EB69')
+    .build());  
+    
+  sheet_events.setConditionalFormatRules(conditionalFormatRules);
+  
+  // Prevent writing non-numbers in personal cells
+  sheet_events.getRange(5, 2, members_list.length, 2 +  add_col).setDataValidation(SpreadsheetApp.newDataValidation()
+    .setAllowInvalid(false)
+    .setHelpText('Escreve um número')
+    .requireFormulaSatisfied('=ISNUMBER(B5)')
+    .build());
+    
+  sheet_events.getRange(3, 2).setDataValidation(SpreadsheetApp.newDataValidation()
+    .setAllowInvalid(false)
+    .setHelpText('Escreve um número')
+    .requireFormulaSatisfied('=ISNUMBER(B3)')
+    .build());
+    
+   sheet_events.getRange(5, 5 + add_col, members_list.length, 1).setDataValidation(SpreadsheetApp.newDataValidation()
+    .setAllowInvalid(false)
+    .setHelpText('Escreve um número')
+    .requireFormulaSatisfied('=ISNUMBER(' + String.fromCharCode(69 + add_col) + '5)')
+    .build()); 
+        
+  
+  // Set Active cell on the Event Name
+  var name_event_cell = sheet_events.getRange(1,2);
+  sheet_events.setActiveRange(name_event_cell);
 }
 
 

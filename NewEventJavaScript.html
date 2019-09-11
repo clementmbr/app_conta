@@ -19,17 +19,15 @@
    */
   function onNewEventClick() {
     this.disabled = true;
+    $('#new-event-cancel-button').attr("disabled", true);
+    showStatus("Criando o novo evento...");
 
     // Gather any information that needs to be sent to the server here.
     var name_event = $('#name-event-value').val();
     var date_event = $('#date-event-value').val();
     var income_event = $('#income-event-value').val();
 
-    // TODO : Add a stop alert if it already exists an event with
-    // the same name at the same date
-
     var inputs_member = document.getElementsByName('member');
-
     var members_list = []
     for(var i = 0; i < inputs_member.length; i++) {
         if(inputs_member[i].checked == true) {
@@ -40,15 +38,15 @@
     var inputs_extra_fee = document.getElementsByName('extra_fee');
     var extra_fee = []
 
-    // extra_fee array is set to look like :
-    // [{production : true} , {cashflow : false}]
     for(var i = 0; i < inputs_extra_fee.length; i++) {
-
         var obj_extra_fee = {};
+        // 1) We create the object {production : true} (or "false" if production is not checked)
         obj_extra_fee[inputs_extra_fee[i].id] = inputs_extra_fee[i].checked;
-
+        
+        // 2) We add the object to the extra_fee array
         extra_fee.splice(extra_fee.length, 0, obj_extra_fee);
     }
+    // At the end, extra_fee array is set to look like : [{production : true} , {cashflow : false}]
 
 
     // Send the value to the server and handle the response.
@@ -58,13 +56,15 @@
             // Respond to success conditions here.
             showStatus('O evento ' + name_event + ' foi criado !');
             element.disabled = false;
-            
+            $('#new-event-cancel-button').attr("disabled", false);
+            google.script.host.close();
           })
         .withFailureHandler(
           function(msg, element) {
             // Respond to failure conditions here.
             showStatus(msg, 'error');
-            element.disabled = false;
+            element.disabled = false
+            $('#new-event-cancel-button').attr("disabled", false);
           })
         .withUserObject(this) // "this" refers to the "Put" button itself here
         .createNewEvent(
@@ -75,7 +75,6 @@
           extra_fee,
         );
   }
-
 
   /**
    * Displays the given status message in the sidebar.

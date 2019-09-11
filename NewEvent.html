@@ -9,7 +9,6 @@
     <!-- Below is the HTML code that defines the sidebar element structure. -->
     <div class="sidebar branding-below">
 
-
       <label for="name-event-value">Nome do evento</label><br>
       <input type="text" id="name-event-value"><br>
 
@@ -54,9 +53,11 @@
       </div>
       <div class="block" id="sidebar-button-bar">
         <button id="new-event-button">Novo Evento</button>
+        <button id="new-event-cancel-button" onclick="google.script.host.close()">Cancelar</button>
       </div>
-
+      
       <div id="sidebar-status"></div>
+
     </div>
 
     <!-- Enter sidebar bottom-branding below. -->
