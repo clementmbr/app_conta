@@ -137,6 +137,7 @@ function createNewEvent(
   var s_extra_fee_bg = "#fef8e3";
   var s_total_bg = "#eff4f8";
   var s_second_font = "#999999";
+  var s_validation_bg = '#63EB69';
 
   // Number of Event's columns
   var col_nb = 5 + add_col;
@@ -384,14 +385,14 @@ function createNewEvent(
   conditionalFormatRules.push(SpreadsheetApp.newConditionalFormatRule()
     .setRanges([sheet_events.getRange(5,4 + add_col, members_list.length, 2)])
     .whenFormulaSatisfied(cond_formula)
-    .setBackground('#63EB69')
+    .setBackground(s_validation_bg)
     .build());
     
      // Conditional Formatting also for Income-received
   conditionalFormatRules.push(SpreadsheetApp.newConditionalFormatRule()
     .setRanges([sheet_events.getRange(3, 1, 1, 2)])
     .whenFormulaSatisfied("=$B3>=ROUNDDOWN($A3)")
-    .setBackground('#63EB69')
+    .setBackground(s_validation_bg)
     .build());  
     
   sheet_events.setConditionalFormatRules(conditionalFormatRules);
