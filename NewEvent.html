@@ -27,30 +27,21 @@
       <p>
         Selecione os participantes do novo evento
       </p>
-      <div class="block col-contain" id="sidebar-value-block">
-        <!-- TODO generate this members list from the names in the sheets names -->
-        <div class="col-one">
-          <input type="checkbox" name="member" id="member1" value="Daniel" checked><label for="member1"> Daniel</label><br>
-          <input type="checkbox" name="member" id="member2" value="Pano" checked><label for="member2"> Pano</label><br>
-          <input type="checkbox" name="member" id="member3" value="Clément" checked><label for="member3"> Clément</label><br>
-          <input type="checkbox" name="member" id="member4" value="João" checked><label for="member4"> João</label><br>
-          <input type="checkbox" name="member" id="member5" value="Michel" checked><label for="member5"> Michel</label><br>
+      <div class="block col-contain" id="names-block">
+        <!-- Generate this members list from the names in the sheets names, in 2 columns-->
+        <div class="col-one" id="names-col-one">
         </div>
-        <div>
-          <input type="checkbox" name="member" id="member6" value="Raphael" checked><label for="member6"> Raphael</label><br>
-          <input type="checkbox" name="member" id="member7" value="Luciano" checked><label for="member7"> Luciano</label><br>
-          <input type="checkbox" name="member" id="member8" value="Mathias" checked><label for="member8"> Mathias</label><br>
-          <input type="checkbox" name="member" id="member9" value="ContaPJ" checked><label for="member9"> Conta PJ</label><br>
+        <div id="names-col-two">
         </div>
       </div>
       <p>
         Vai ter dinheiro para a Caixa e/ou a Produção ?
       </p>
-      <div class="block form-group" id="sidebar-value-block">
+      <div class="block form-group" id="extra-fee-block">
         <input type="checkbox" name="extra_fee" id="production"><label for="production"> Produção</label><br>
         <input type="checkbox" name="extra_fee" id="cashflow"><label for="cashflow"> Caixa</label><br>
       </div>
-      <div class="block" id="sidebar-button-bar">
+      <div class="block" id="dialog-button-bar">
         <button id="new-event-button">Novo Evento</button>
         <button id="new-event-cancel-button" onclick="google.script.host.close()">Cancelar</button>
       </div>

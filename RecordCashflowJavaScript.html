@@ -1,0 +1,77 @@
+<script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+<script>
+  /**
+   * Run initializations on dialog load.
+   */
+  
+  // Generate the Event names dropdown list names in Record Cashflow dialog 
+  // from a eventNames array
+  function generateCheckBoxNames(eventNames) {
+    var select = document.getElementById("events-select");
+    for (var i = 0; i < eventNames.length; i++) {
+      select.options.add( new Option(eventNames[i],eventNames[i]) )
+    }
+  }
+  
+  // Call the server, once  getCashflowNames() successfully runned
+  // run generateCheckBoxNames() to generate the names checklist
+  google.script.run
+    .withSuccessHandler(generateCheckBoxNames)
+    .getEventNames(); 
+
+  $(function() {
+    // Assign handler functions to sidebar elements here, if needed.
+    $('#record-cashflow-button').click(onRecordCashflowClick);
+
+    // Call the server here to retrieve any information needed to build
+    // the dialog, if necessary.
+  });
+
+  /**
+   * Calls the server to create the NewEvent columns
+   */
+  function onRecordCashflowClick() {
+    this.disabled = true;
+    $('#record-cashflow-cancel-button').attr("disabled", true);
+    showStatus("Registrando as receitas do evento...");
+    
+    var event_name = document.getElementById("events-select").value;
+    
+
+ 
+    // Send the value to the server and handle the response.
+    google.script.run
+        .withSuccessHandler(
+          function(msg, element) {
+            // Respond to success conditions here.
+            showStatus('O evento ' + event_name + ' foi registrado !');
+            element.disabled = false; // element is the object "New Event button"
+            $('#new-event-cancel-button').attr("disabled", false);
+            google.script.host.close();
+          })
+        .withFailureHandler(
+          function(msg, element) {
+            // Respond to failure conditions here.
+            showStatus(msg, 'error');
+            element.disabled = false
+            $('#new-event-cancel-button').attr("disabled", false);
+          })
+        .withUserObject(this) // "this" refers to the object "New Event button" itself here
+        .recordEvent(event_name);
+  }
+
+  /**
+   * Displays the given status message in the sidebar.
+   *
+   * @param {String} msg The status message to display.
+   * @param {String} classId The message type (class id) that the message
+   *   should be displayed as.
+   */
+  function showStatus(msg, classId) {
+    $('#sidebar-status').removeClass().html(msg);
+    if (classId) {
+      $('#sidebar-status').addClass(classId);
+    }
+  }
+
+</script>

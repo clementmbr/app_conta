@@ -2,26 +2,33 @@
  * @OnlyCurrentDoc  Limits the script to only accessing the current spreadsheet.
  */
 
+// GLOBAL VARIABLES - TODO : Set this variables in ScriptProperties !
 var DIALOG_EVENT_TITLE = 'Novo Evento';
-var SIDEBAR_EVENT_TITLE = 'Novo Evento';
+var DIALOG_CASHFLOW_TITLE = 'Registrar Evento';
 var SHEET_EVENT_NAME = '_Eventos';
 
+  // Title variables
+var t_total_income = "Cachê";
+var t_partial_income = "Recebido";
+var t_net_result = "Líquido";
+var t_leftover = "Resto";
 
-// Get an array of the Sheets names that can receive CashFlow
-// from an event.
-function getCashflowNames() {
-  var cashflowNames = [];
-  var sheets = SpreadsheetApp.getActiveSpreadsheet().getSheets();
-  
-  for (var i=0 ; i<sheets.length ; i++) {
-    var sheet_name = sheets[i].getName();
-    
-    if (sheet_name.indexOf("_") != 0) {
-      cashflowNames.push(sheet_name);
-    }
-  }
-  return cashflowNames 
-}
+var t_expenses = "Gastos";
+var t_fees = "Cachê";
+var t_total = "TOTAL";
+var t_received = "Recebido";
+
+var t_production = "Produção";
+var t_cashflow = "Caixa";
+
+  // Cells style
+var s_money = '[$R$ -416]#,##0';
+var s_percent = '0%';
+var s_first_bg = "#fff3f9";
+var s_extra_fee_bg = "#fef8e3";
+var s_total_bg = "#eff4f8";
+var s_second_font = "#999999";
+var s_validation_bg = '#aefab2';
 
 /**
  * Adds a custom menu with items to show the sidebar and dialog.
@@ -32,14 +39,8 @@ function onOpen(e) {
   SpreadsheetApp.getUi()
       .createAddonMenu()
       .addItem('Novo Evento', 'newEventDialog')
+      .addItem('Registrar Evento', 'recordCashflowDialog')
       .addToUi();
-      
-  var docProperties = PropertiesService.getDocumentProperties();
-  var jCashflowNames = JSON.stringify(getCashflowNames());
-  docProperties.setProperty('jCashflowNames', jCashflowNames);
-  
-  Logger.log(JSON.parse(docProperties.getProperty('jCashflowNames')));
-  Logger.log(JSON.parse(docProperties.getProperty('jCashflowNames'))[2]);
 }
 
 /**
@@ -52,20 +53,169 @@ function onInstall(e) {
   onOpen(e);
 }
 
- /**
-  * Opens a dialog. The dialog structure is described in the Dialog.html
-  * project file.
-  */
- function newEventDialog() {
+/**
+* Opens a dialog to create New Event. The dialog structure is described in the NewEvent.html
+* project file.
+*/
+function newEventDialog() {
    var ui = HtmlService.createTemplateFromFile('NewEvent')
        .evaluate()
        .setWidth(350)
        .setHeight(500)
        .setSandboxMode(HtmlService.SandboxMode.IFRAME);
    SpreadsheetApp.getUi().showModalDialog(ui, DIALOG_EVENT_TITLE);
- }
-
+}
+ 
+ 
 /**
+  * Opens a dialog. The dialog structure is described in the RecordCashflow.html
+  * project file.
+  */
+function recordCashflowDialog() {
+  var ui = HtmlService.createTemplateFromFile('RecordCashflow')
+  .evaluate()
+  .setWidth(350)
+  .setHeight(200)
+  .setSandboxMode(HtmlService.SandboxMode.IFRAME);
+  SpreadsheetApp.getUi().showModalDialog(ui, DIALOG_CASHFLOW_TITLE);
+}
+
+// Return an array of the Sheets names that can receive CashFlow
+// from an event.
+function getCashflowNames() {
+  var cashflowNames = [];
+  var sheets = SpreadsheetApp.getActiveSpreadsheet().getSheets();
+  
+  for (var i=0 ; i<sheets.length ; i++) {
+    var sheet_name = sheets[i].getName();
+    if (sheet_name.indexOf("_") != 0) {
+      cashflowNames.push(sheet_name);
+    }
+  }
+  return cashflowNames 
+}
+
+// Return an array of the event names on the Event sheet
+function getEventNames() {
+  var eventNames = [];
+  var spreadsheet = SpreadsheetApp.getActive();
+  var sheet_events = spreadsheet.getSheetByName(SHEET_EVENT_NAME);
+  var first_row = sheet_events.getRange(1,1,1,200).getValues()[0];
+  
+  for (var i=0 ; i<first_row.length ; i++) {
+    var cel = first_row[i];
+    var prohibited_val = ["", t_production, t_cashflow];
+    
+    if (typeof cel == 'string' && prohibited_val.indexOf(cel) == -1) {
+      eventNames.push(cel);
+    }
+  }
+  return eventNames 
+}
+
+
+/*****************************************************************************************
+ * Record the money received by each member in his own sheet
+ *
+ * @param {string} event_name : the event's name selected in the Dialog
+ *
+ */
+function recordEvent(event_name) {
+
+  var spreadsheet = SpreadsheetApp.getActive();
+  var sheet_events = spreadsheet.getSheetByName(SHEET_EVENT_NAME);
+  var first_row = sheet_events.getRange(1,1,1,200).getValues()[0];
+  
+  // Catch the event column
+  for (var i=0 ; i<first_row.length ; i++) {
+    if (first_row[i] == event_name) {
+      var event_col = i + 1;
+      break;
+    }
+  }
+  // Catch the last column of the event range
+  var event_range_large = sheet_events.getRange(4, event_col - 1, 1, 20).getValues();
+  for (var i = 0; i < event_range_large[0].length; i++) {
+    if (event_range_large[0][i] == t_received) {
+      var last_col = i;
+      break;
+    }
+  }
+  // Catch the perfect event range using the member's list that can receive cashflow
+  var members = getCashflowNames();
+  var event_range = sheet_events
+    .getRange(4, event_col - 1, members.length + 1,last_col + 1)
+    .getValues();
+ 
+  // Create a cashDivision object with organized and selected values to record
+  var cashDivision = {};
+  
+  for (var i = 1; i < event_range.length; i++) {
+    cashDivision[event_range[i][0]] = {};
+    
+    for (var j = 1; j < event_range[0].length; j++) {
+      if (event_range[0][j] == t_fees) {
+        cashDivision[event_range[i][0]][t_fees] = event_range[i][j];
+        
+      } else if (event_range[0][j] == t_production) {
+          cashDivision[event_range[i][0]][t_production] = event_range[i][j];
+      
+      } else if (event_range[0][j] == t_cashflow) {
+          cashDivision[event_range[i][0]][t_cashflow] = event_range[i][j];
+      }
+    }
+  }
+  
+  // Special function to record the incomes data stored in "cashDivision[name]" object
+  // into the "sheets[i]" sheet
+  function recordInSheet(persIncomes, Sheet) {
+    var first_row = Sheet.getRange(1,1,1, 20).getValues()[0];
+    
+    for (var title in persIncomes) {
+    
+      if (persIncomes[title] != "") {
+      
+        for (var j = 0; j < first_row.length; j++) {
+          if (first_row[j].toLowerCase().indexOf(title.toLowerCase()) == 0) {
+          
+            if (title.toLowerCase().indexOf(t_cashflow.toLowerCase()) == 0) {
+              // Fill CashFlow
+              Sheet.getRange(4, j + 4, 1, 3).insertCells(SpreadsheetApp.Dimension.ROWS);
+              Sheet.getRange(4, j + 4).setValue(persIncomes[title]);
+              Sheet.getRange(4, j + 5).setValue(title + " " + event_name);
+              Sheet.getRange(4, j + 6).setValue(new Date());
+            
+            } else {
+            
+              // Fill the other fill except Cashflow
+              Sheet.getRange(4, j + 1, 1, 3).insertCells(SpreadsheetApp.Dimension.ROWS);
+              Sheet.getRange(4, j + 1).setValue(persIncomes[title]);
+              Sheet.getRange(4, j + 2).setValue(new Date());
+              Sheet.getRange(4, j + 3).setValue(title + " " + event_name);
+            }
+          }
+        }
+      }
+    }
+  }
+  
+  var sheets = SpreadsheetApp.getActiveSpreadsheet().getSheets();
+  
+  for (var i=0 ; i<sheets.length ; i++) {
+    var sheet_name = sheets[i].getName();
+    
+    for (var name in cashDivision) {
+      if (sheet_name == name) {
+        // record the incomes data stored in the cashDivision[name] object into sheets[i]
+        recordInSheet(cashDivision[name], sheets[i]);
+        continue;
+      }
+    }
+  }
+}
+
+
+/*****************************************************************************************
  * Create the formatted columns of a new account event
  *
  * Exemples of parameters received by the client-side JS : 
@@ -88,23 +238,23 @@ function createNewEvent(
   members_list,
   extra_fee
 ) {
-  // Use data collected from sidebar to manipulate the sheet.
-
   var spreadsheet = SpreadsheetApp.getActive();
   var sheet_events = spreadsheet.getSheetByName(SHEET_EVENT_NAME);
 
   var partial_income = 0;
+  var t_income = [t_total_income, t_partial_income, t_net_result, t_leftover];
+  var t_perperson = [t_expenses, t_fees, t_total, t_received];
   
   // Define a better list of objects to build extra_fee columns
   var obj_extra_fee = [  
     {
       istrue : false,
-      title : "Produção",
+      title : t_production,
       percent : "10%",      
     },
     {
       istrue : false,
-      title : "Caixa",
+      title : t_cashflow,
       percent : "20%",      
     }
   ];
@@ -128,29 +278,6 @@ function createNewEvent(
     }
   }
   
-  // Define title variables
-  
-  var t_total_income = "Cachê";
-  var t_partial_income = "Recebido";
-  var t_net_result = "Líquido";
-  var t_leftover = "Resto";
-  var t_income = [t_total_income, t_partial_income, t_net_result, t_leftover];
-
-  var t_expenses = "Gastos";
-  var t_fees = "Cachês";
-  var t_total = "TOTAL";
-  var t_received = "Recebido";
-  var t_perperson = [t_expenses, t_fees, t_total, t_received];
-
-  // Cells style
-  var s_money = '[$R$ -416]#,##0';
-  var s_percent = '0%';
-  var s_first_bg = "#fff3f9";
-  var s_extra_fee_bg = "#fef8e3";
-  var s_total_bg = "#eff4f8";
-  var s_second_font = "#999999";
-  var s_validation_bg = '#aefab2';
-
   // Number of Event's columns
   var col_nb = 5 + add_col;
 

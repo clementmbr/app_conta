@@ -3,8 +3,44 @@
   /**
    * Run initializations on dialog load.
    */
+   
+  // Generate the Chechlist names in New Event dialog 
+  // from a cashflowNames array
+  function generateCheckBoxNames(cashflowNames) {
+
+    var namesDivColOne = document.getElementById("names-col-one");
+    var namesDivColTwo = document.getElementById("names-col-two");
+    
+    for (var i = 0; i < cashflowNames.length; i++) {
+      var checkBox = document.createElement("input");
+      var label = document.createElement("label");
+      checkBox.type = "checkbox";
+      checkBox.value = cashflowNames[i];
+      checkBox.id = cashflowNames[i];
+      checkBox.name = "member";
+      checkBox.checked = true;
+      label.setAttribute("for", cashflowNames[i]);
+      label.appendChild(document.createTextNode(cashflowNames[i]));
+      label.appendChild(document.createElement("br"));
+      
+      if (i < cashflowNames.length / 2) {
+        namesDivColOne.appendChild(checkBox);
+        namesDivColOne.appendChild(label);          
+      } else {
+        namesDivColTwo.appendChild(checkBox);
+        namesDivColTwo.appendChild(label);                
+      }
+    }
+  }
+  
+  // Call the server, once  getCashflowNames() successfully runned
+  // run generateCheckBoxNames() to generate the names checklist
+  google.script.run
+    .withSuccessHandler(generateCheckBoxNames)
+    .getCashflowNames();
+   
   $(function() {
-    // Assign handler functions to sidebar elements here, if needed.
+    // Assign handler functions to dialog elements here, if needed.
     $('#new-event-button').click(onNewEventClick);
 
     // Call the server here to retrieve any information needed to build
@@ -13,10 +49,10 @@
 
 
   /**
-   * Calls the server to modify the sheet.
-   * and create the NewEvent Columns
+   * Calls the server to create the NewEvent columns
    */
   function onNewEventClick() {
+  
     this.disabled = true;
     $('#new-event-cancel-button').attr("disabled", true);
     showStatus("Criando o novo evento...");
@@ -54,7 +90,7 @@
           function(msg, element) {
             // Respond to success conditions here.
             showStatus('O evento ' + name_event + ' foi criado !');
-            element.disabled = false;
+            element.disabled = false; // element is the object "New Event button"
             $('#new-event-cancel-button').attr("disabled", false);
             google.script.host.close();
           })
@@ -65,7 +101,7 @@
             element.disabled = false
             $('#new-event-cancel-button').attr("disabled", false);
           })
-        .withUserObject(this) // "this" refers to the "Put" button itself here
+        .withUserObject(this) // "this" refers to the object "New Event button" itself here
         .createNewEvent(
           name_event,
           date_event,
