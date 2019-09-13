@@ -2,8 +2,26 @@
  * @OnlyCurrentDoc  Limits the script to only accessing the current spreadsheet.
  */
 
-var DIALOG_TITLE = 'Novo Evento';
+var DIALOG_EVENT_TITLE = 'Novo Evento';
 var SIDEBAR_EVENT_TITLE = 'Novo Evento';
+var SHEET_EVENT_NAME = '_Eventos';
+
+
+// Get an array of the Sheets names that can receive CashFlow
+// from an event.
+function getCashflowNames() {
+  var cashflowNames = [];
+  var sheets = SpreadsheetApp.getActiveSpreadsheet().getSheets();
+  
+  for (var i=0 ; i<sheets.length ; i++) {
+    var sheet_name = sheets[i].getName();
+    
+    if (sheet_name.indexOf("_") != 0) {
+      cashflowNames.push(sheet_name);
+    }
+  }
+  return cashflowNames 
+}
 
 /**
  * Adds a custom menu with items to show the sidebar and dialog.
@@ -13,9 +31,15 @@ var SIDEBAR_EVENT_TITLE = 'Novo Evento';
 function onOpen(e) {
   SpreadsheetApp.getUi()
       .createAddonMenu()
-//      .addItem('Novo Evento', 'newEventSidebar')
       .addItem('Novo Evento', 'newEventDialog')
       .addToUi();
+      
+  var docProperties = PropertiesService.getDocumentProperties();
+  var jCashflowNames = JSON.stringify(getCashflowNames());
+  docProperties.setProperty('jCashflowNames', jCashflowNames);
+  
+  Logger.log(JSON.parse(docProperties.getProperty('jCashflowNames')));
+  Logger.log(JSON.parse(docProperties.getProperty('jCashflowNames'))[2]);
 }
 
 /**
@@ -28,18 +52,6 @@ function onInstall(e) {
   onOpen(e);
 }
 
-///**
-// * Opens a sidebar. The sidebar structure is described in the Sidebar.html
-// * project file.
-// */
-//function newEventSidebar() {
-//  var ui = HtmlService.createTemplateFromFile('NewEvent')
-//      .evaluate()
-//      .setTitle(SIDEBAR_EVENT_TITLE)
-//      .setSandboxMode(HtmlService.SandboxMode.IFRAME);
-//  SpreadsheetApp.getUi().showSidebar(ui); // "showSidebar" is a special SpreadsheetApp funcion
-//}
-
  /**
   * Opens a dialog. The dialog structure is described in the Dialog.html
   * project file.
@@ -50,7 +62,7 @@ function onInstall(e) {
        .setWidth(350)
        .setHeight(500)
        .setSandboxMode(HtmlService.SandboxMode.IFRAME);
-   SpreadsheetApp.getUi().showModalDialog(ui, DIALOG_TITLE);
+   SpreadsheetApp.getUi().showModalDialog(ui, DIALOG_EVENT_TITLE);
  }
 
 /**
@@ -79,7 +91,7 @@ function createNewEvent(
   // Use data collected from sidebar to manipulate the sheet.
 
   var spreadsheet = SpreadsheetApp.getActive();
-  var sheet_events = spreadsheet.getSheetByName("Eventos");
+  var sheet_events = spreadsheet.getSheetByName(SHEET_EVENT_NAME);
 
   var partial_income = 0;
   
@@ -137,7 +149,7 @@ function createNewEvent(
   var s_extra_fee_bg = "#fef8e3";
   var s_total_bg = "#eff4f8";
   var s_second_font = "#999999";
-  var s_validation_bg = '#63EB69';
+  var s_validation_bg = '#aefab2';
 
   // Number of Event's columns
   var col_nb = 5 + add_col;

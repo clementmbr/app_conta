@@ -1,7 +1,7 @@
 <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
 <script>
   /**
-   * Run initializations on sidebar load.
+   * Run initializations on dialog load.
    */
   $(function() {
     // Assign handler functions to sidebar elements here, if needed.
@@ -14,8 +14,7 @@
 
   /**
    * Calls the server to modify the sheet.
-   * Replace the currently selected cell value with the value in the
-   * sidebar text field.
+   * and create the NewEvent Columns
    */
   function onNewEventClick() {
     this.disabled = true;
