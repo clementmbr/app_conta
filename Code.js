@@ -560,8 +560,3 @@ function createNewEvent(
   var name_event_cell = sheet_events.getRange(1,2);
   sheet_events.setActiveRange(name_event_cell);
 }
-
-
-
-
-

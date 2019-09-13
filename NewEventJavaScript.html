@@ -42,9 +42,6 @@
   $(function() {
     // Assign handler functions to dialog elements here, if needed.
     $('#new-event-button').click(onNewEventClick);
-
-    // Call the server here to retrieve any information needed to build
-    // the dialog, if necessary.
   });
 
 
@@ -79,7 +76,7 @@
         obj_extra_fee[inputs_extra_fee[i].id] = inputs_extra_fee[i].checked;
         
         // 2) We add the object to the extra_fee array
-        extra_fee.splice(extra_fee.length, 0, obj_extra_fee);
+        extra_fee.push(obj_extra_fee);
     }
     // At the end, extra_fee array is set to look like : [{production : true} , {cashflow : false}]
 
