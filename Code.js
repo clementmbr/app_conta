@@ -134,17 +134,25 @@ function recordEvent(event_name) {
     }
   }
   // Catch the last column of the event range
-  var event_range_large = sheet_events.getRange(4, event_col - 1, 1, 20).getValues();
-  for (var i = 0; i < event_range_large[0].length; i++) {
-    if (event_range_large[0][i] == t_received) {
-      var last_col = i;
+  var event_range_large = sheet_events.getRange(4, event_col - 1, 40, 20).getValues();
+  for (var j = 0; j < event_range_large[0].length; j++) {
+    if (event_range_large[0][j] == t_received) {
+      var last_col = j;
       break;
     }
   }
   // Catch the perfect event range using the member's list that can receive cashflow
-  var members = getCashflowNames();
+//  var members = getCashflowNames();
+  
+  var last_row = 1;
+  for (var i = 1; i < event_range_large.length; i++) {
+    if (event_range_large[i][0] != "") {
+      last_row = i;
+    }
+  }
+  
   var event_range = sheet_events
-    .getRange(4, event_col - 1, members.length + 1,last_col + 1)
+    .getRange(4, event_col - 1, last_row + 1,last_col + 1)
     .getValues();
  
   // Create a cashDivision object with organized and selected values to record
@@ -179,19 +187,61 @@ function recordEvent(event_name) {
           if (first_row[j].toLowerCase().indexOf(title.toLowerCase()) == 0) {
           
             if (title.toLowerCase().indexOf(t_cashflow.toLowerCase()) == 0) {
-              // Fill CashFlow
-              Sheet.getRange(4, j + 4, 1, 3).insertCells(SpreadsheetApp.Dimension.ROWS);
-              Sheet.getRange(4, j + 4).setValue(persIncomes[title]);
-              Sheet.getRange(4, j + 5).setValue(title + " " + event_name);
-              Sheet.getRange(4, j + 6).setValue(new Date());
+              // ****FILL CASHFLOW INCOME****
+              var col_income = j + 4;
+              var col_date = j + 6;
+              var col_name = j + 5;
+              var row_insert = 4;
+              var name_income = title + " " + event_name;
+              
+              // Check if the event record doesn't exist already
+              var actual_record = Sheet.getRange(4, j + 4, 30, 3).getValues();
+              var isnew_record = true;
+              
+              
+              
+              for (var i = actual_record.length - 1; i >= 0 ; i--) {
+              Logger.log("Nome record" + actual_record[i][col_name - j - 1 - 3]);
+                if (actual_record[i][col_name - j - 4] == name_income) {
+                  row_insert = 4 + i;
+                  isnew_record = false;
+                }
+              }
+              // Insert New row if is a new record
+              if (isnew_record) {
+                Sheet.getRange(row_insert, col_income, 1, 3).insertCells(SpreadsheetApp.Dimension.ROWS);
+              }
+              // Fill the cells
+              Sheet.getRange(row_insert, col_income).setValue(persIncomes[title]);
+              Sheet.getRange(row_insert, col_date).setValue(new Date());
+              Sheet.getRange(row_insert, col_name).setValue(title + " " + event_name);
             
             } else {
-            
-              // Fill the other fill except Cashflow
-              Sheet.getRange(4, j + 1, 1, 3).insertCells(SpreadsheetApp.Dimension.ROWS);
-              Sheet.getRange(4, j + 1).setValue(persIncomes[title]);
-              Sheet.getRange(4, j + 2).setValue(new Date());
-              Sheet.getRange(4, j + 3).setValue(title + " " + event_name);
+            // ****FILL OTHER INCOMES****
+              var col_income = j + 1;
+              var col_date = j + 2;
+              var col_name = j + 3;
+              var row_insert = 4;
+              var name_income = title + " " + event_name;
+              
+              // Check if the event record doesn't exist already
+              var actual_record = Sheet.getRange(4, j + 1, 30, 3).getValues();
+              var isnew_record = true;
+              
+              for (var i = actual_record.length - 1; i >= 0 ; i--) {
+                if (actual_record[i][col_name - j - 1] == name_income) {
+                  row_insert = 4 + i;
+                  isnew_record = false;
+                }
+              }
+              // Insert New row if is a new record
+              if (isnew_record) {
+                Sheet.getRange(row_insert, col_income, 1, 3).insertCells(SpreadsheetApp.Dimension.ROWS);
+              }
+              // Fill the cells
+              Sheet.getRange(row_insert, col_income).setValue(persIncomes[title]);
+              Sheet.getRange(row_insert, col_date).setValue(new Date());
+              Sheet.getRange(row_insert, col_name).setValue(title + " " + event_name);
             }
           }
         }
@@ -203,6 +253,8 @@ function recordEvent(event_name) {
   
   for (var i=0 ; i<sheets.length ; i++) {
     var sheet_name = sheets[i].getName();
+    
+    Logger.log("*******" + sheet_name + "*********");
     
     for (var name in cashDivision) {
       if (sheet_name == name) {
