@@ -7,10 +7,13 @@ var DIALOG_EVENT_TITLE = 'Novo Evento';
 var DIALOG_CASHFLOW_TITLE = 'Registrar Evento';
 var SHEET_EVENT_NAME = '_Eventos';
 
+// Array of sheet names that cannot reveice gig fee
+var no_fee_list = ["ContaPJ"];
+
   // Title variables
 var t_total_income = "Cachê";
 var t_partial_income = "Recebido";
-var t_net_result = "Líquido";
+var t_net_result = "Dividir";
 var t_leftover = "Resto";
 
 var t_expenses = "Gastos";
@@ -386,12 +389,12 @@ function createNewEvent(
         .setHorizontalAlignment('center')
         .setNumberFormat(s_percent);
         
-      var col_letter_person = String.fromCharCode(67 + k);
-      var col_letter_percent = String.fromCharCode(69 + k);
-      var formula_leftover = "=" + col_letter_percent + "2*C3-SUM(" + col_letter_person + "5:" + col_letter_person +"200)";
+      var colomun_person = String.fromCharCode(67 + k) + "5:" + String.fromCharCode(67 + k) + "200";
+      var cell_percent = String.fromCharCode(69 + k) + "2";
+      var formula_leftover = "=" + cell_percent + "*(A3-SUM(B5:B200))" + "-SUM(" + colomun_person + ")";
         
       sheet_events.getRange(3, 5 + k)
-        .setFormula(formula_leftover)  // Leftover in the first extra_fee column
+        .setFormula(formula_leftover)
         .setHorizontalAlignment('center')
         .setBackground(s_extra_fee_bg)
         .setFontColor(s_second_font)
@@ -399,7 +402,7 @@ function createNewEvent(
     }
   }
 
-  // Income
+  // Income titles
   for (var i = 0; i < t_income.length; i++) {
     sheet_events.getRange(2, 1 + i)
       .setValue(t_income[i])
@@ -420,9 +423,17 @@ function createNewEvent(
 
   sheet_events.getRange(2, 3)
     .setFontColor(s_second_font);
-
+    
+  // Formula for total net_result
+  
+  var cells_extrafee = ""
+  if (add_col > 0) {
+    cells_extrafee = "-SUM(F2:" + String.fromCharCode(69 + add_col) + "2)";
+  }
+  var formula_net_result = "=(A3-SUM(B5:B200))*(1" + cells_extrafee + ")";
+  
   sheet_events.getRange(3, 3)
-    .setFormula('=A3-SUM(B5:B200)')
+    .setFormula(formula_net_result)
     .setHorizontalAlignment('center')
     .setBackground(s_first_bg)
     .setFontColor(s_second_font)
@@ -430,15 +441,21 @@ function createNewEvent(
 
   sheet_events.getRange(2, 4)
     .setFontColor(s_second_font);
-
+    
+  // Formula for total leftover
+  
+  var formula_leftover = "=A3-SUM(" 
+    + String.fromCharCode(68 + add_col) + "5:"
+    + String.fromCharCode(68 + add_col) + "200)";
+  
   sheet_events.getRange(3, 4)
-    .setFormula('=C3-SUM(F5:F200)')
+    .setFormula(formula_leftover)
     .setHorizontalAlignment('center')
     .setBackground(s_first_bg)
     .setFontColor(s_second_font)
     .setNumberFormat(s_money);
 
-  // Per person
+  // Individual columns titles
   sheet_events.getRange(4, 2)
     .setValue(t_expenses)
     .setHorizontalAlignment('center')
@@ -461,6 +478,19 @@ function createNewEvent(
     .setValue(t_received)
     .setHorizontalAlignment('center')
     .setFontStyle("italic");
+    
+  // Formula on individual fee
+  var r_fee = sheet_events.getRange(5, 3, members_list.length, 1);
+  var nb_fee_division = members_list.length - no_fee_list.length;
+  
+  r_fee.setFormula("=$C$3/" + nb_fee_division);
+  
+  // Erase the formula on lines that can not receive fee
+  no_fee_list.forEach(function(name) {
+    sheet_events
+      .getRange(5 + no_fee_list.indexOf(name), 3)
+      .clearContent();
+  });
 
   // Set alternative color and money format on personal lines
   
